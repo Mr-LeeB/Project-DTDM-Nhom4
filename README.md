@@ -22,28 +22,28 @@
 - Tạo 1 máy ảo EC2 Ubuntu trong public subnet: Ubuntu 18.04 LTS (HVM), SSD Volume Type
 #### 3. Cấu hình EC2
 - Cài đặt Apache2, PHP
-'
+```
 sudo apt update
 sudo apt install apache2
 sudo apt install php libapache2-mod-php
 sudo nano /etc/apache2/mods-enabled/dir.conf (đưa index.php lên trước index.html)
 sudo systemctl restart apache2
-'
+```
 - Tải source code từ github về và cài đặt
-'
+```
 cd /var/www/html
 wget https://github.com/Mr-LeeB/Project-DTDM-Nhom4/archive/refs/heads/master.zip
 unzip master.zip
 cp -r Project-DTDM-Nhom4-master/* /var/www/html/
 rm -rf Project-DTDM-Nhom4-master master.zip
-'
+```
 - Composer, AWS SDK for PHP
-'
+```
 sudo su
 curl -s http://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/
 php -d memory_limit=-1 /usr/local/bin/composer.phar require aws/aws-sdk-php
-'
+```
 #### 4. Công nghệ sử dụng
 - AWS SDK for PHP
 - DynamoDB
