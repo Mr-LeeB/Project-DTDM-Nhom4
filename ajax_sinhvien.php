@@ -155,7 +155,6 @@ if ( $count > 0) {
 		<tbody>
 			<?php
 			$a = 0;
-			if ($result){
 				foreach( $result['Items'] as $i ) {
 					$item = $marsharler->unmarshalItem($i);
 					if ($item['MaLop'] == $maLop) {
@@ -177,7 +176,6 @@ if ( $count > 0) {
 						echo "</tr>";
 					}
 				}
-			}
 			?>
 		</tbody>
 		<!--  end in danh sách-->

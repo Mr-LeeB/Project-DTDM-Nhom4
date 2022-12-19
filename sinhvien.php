@@ -6,7 +6,6 @@ $params = [
 	'ProjectionExpression' => 'MaLop, Khoa, MaCN, TenLop'
 ];
 $result = $db->scan($params);
-echo $result['Count'];
 ?>
 
 <div class="group-box">
