@@ -17,10 +17,15 @@
 			$in = "''"; 
 			foreach($_POST["chkmasv"] as $val){				
 				$in .= ",'".$val."'";			 
-			}
-			$sql = "DELETE FROM dbo_sinhvien WHERE MaSV IN(".$in.")";
-			
-			$result = $db->query($sql);
+			// }
+			// $sql = "DELETE FROM dbo_sinhvien WHERE MaSV IN(".$in.")";
+			// $result = $db->query($sql);
+			$result = $db->deleteItem(array( 
+				'TableName' => 'sinhvien',
+				'Key'       => array(
+					'MaSV'   => array('S' => $in)
+				)
+			));
 			if ($result && $db->affected_rows > 0){ 
 				echo "<div class='success'>Đã xóa thành công</div>";
 			}else{
@@ -31,14 +36,27 @@
 		//kiểm tra trường hợp xóa 1 dòng (nhấn nút xóa bên phải)
 		if (isset($_POST["btnXoa"])){
 			$masv = $_POST["btnXoa"];
-			$sql = "DELETE FROM dbo_sinhvien WHERE MaSV='".$masv."'";
-			$result = $db->query($sql);
+			// $sql = "DELETE FROM dbo_sinhvien WHERE MaSV='".$masv."'";
+			// $result = $db->query($sql);
+			$result = $db->deleteItem(array( 
+				'TableName' => 'sinhvien',
+				'Key'       => array(
+					'MaSV'   => array('S' => $masv)
+				)
+			));
 			if ($result && $db->affected_rows > 0){ 
 				echo "<div class='success'>Đã xóa thành công</div>";
 			}else{
 				echo "<div class='error'>Có lỗi xảy ra khi xóa.</div>";
 			}
-		}	
+		}
+		$marsharler = new Aws\DynamoDb\Marshaler();
+		$params = [
+			'TableName' => 'lopchuyennganh',
+			'ProjectionExpression' => 'MaCN, Khoa, MaLop, TenLop'
+		];
+		$result = $db->scan($params);
+}	
 	?>
 		<form method="post" name="frmSV" action="<?php echo $_SERVER["PHP_SELF"];?>">			
 			<label>Chọn lớp:</label>
@@ -46,20 +64,32 @@
 				<option value="">--chọn--</option>
 				<?php 
 				// IN danh sách lớp
-				$sql ="SELECT * FROM dbo_lopchuyennganh ORDER BY MaCN";
-				$result = $db->query($sql);
-				if ($result){
-					while($row = $result->fetch_array()){
-						echo "<option value='".$row["MaLop"]."'";
+				// $sql ="SELECT * FROM dbo_lopchuyennganh ORDER BY MaCN";
+				// $result = $db->query($sql);
+
+				
+				foreach( $result['Items'] as $i ) {
+					$item = $marsharler->unmarshalItem($i);
+					echo "<option value='".$item["MaLop"]."'";
 					// nếu lớp trùng với lớp đã chọn, đánh dấu chọn trong ds
-					if($row["MaLop"] == $maLop){
+					if($item["MaLop"] == $maLop){
 						echo " selected ";
 					}
-				 echo ">";
-				echo $row["TenLop"]."</option>";
-					}
+					echo ">";
+					echo $item["TenLop"]."</option>";
 				}
-				$result->free();
+				// if ($result){
+				// 	while($row = $result->fetch_array()){
+				// 		echo "<option value='".$row["MaLop"]."'";
+				// 	// nếu lớp trùng với lớp đã chọn, đánh dấu chọn trong ds
+				// 	if($row["MaLop"] == $maLop){
+				// 		echo " selected ";
+				// 	}
+				//  echo ">";
+				// echo $row["TenLop"]."</option>";
+				// 	}
+				// }
+
 				?>							
 			</select>
 			<button type="submit" class="btn"> Hiển Thị </button>
@@ -67,8 +97,15 @@
 			<hr>
 			<?php 
 			// tính tổng số dòng 
-			$sql = "SELECT COUNT(*) FROM dbo_sinhvien WHERE MaLop='".$maLop."'";
-			$result = $db->query($sql);
+			// $sql = "SELECT COUNT(*) FROM dbo_sinhvien WHERE MaLop='".$maLop."'";
+			// $result = $db->query($sql);
+			$params = [
+				'TableName' => 'sinhvien',
+				'ProjectionExpression' => 'MaSV',
+				'FilterExpression' => 'MaLop = :MaLop',
+				'ExpressionAttributeValues' =>  [ ':MaLop' => ['S' => $maLop] ]
+			];
+			$result = $db->scan($params);
 			$total_row = 0;
 			if ($result){
 				$row = $result->fetch_array();
@@ -78,7 +115,6 @@
 			$limit = 5;
 			// tính tổng trang, dùng hàm ceil lấy phần nguyên (không dùng floor)
 			$total_page = $total_row==0?1:ceil($total_row/$limit);
-			$result->free();
 			 
 			
 			// để lưu trữ trang hiện tại được POST mỗi khi submit trang
@@ -149,11 +185,16 @@
 			// vị trí bắt đầu SELECT trong CSDL
 			$start_row = $current_page==1?0:($current_page-1)*$limit;
 			 
-			$sql = "SELECT * FROM dbo_sinhvien WHERE MaLop='".$maLop."' LIMIT $start_row, $limit";
-			$result = $db->query($sql);			 
+
 			// nếu có dữ liệu thì hiển thị danh sách
-			
-			if ($result && $result->num_rows>0){
+			$params = [
+				'TableName' => 'sinhvien',
+				'ProjectionExpression' => 'MaSV, MaLop, HoLot, Ten, NgaySinh, GioiTinh, QueQuan, Email',
+				'FilterExpression' => 'MaLop = :MaLop',
+				'ExpressionAttributeValues' =>  [ ':MaLop' => ['S' => $maLop] ]
+			];
+			$result = $db->scan($params);
+			if ($result['Count'] > 0){
 		?>
 		<table class="ds">
 			<!-- in tiêu đề danh sách -->
@@ -172,26 +213,27 @@
 			 <!-- end in tiêu đề-->
 			 <!-- inh danh dánh -->
 			 <tbody>
-				<?php 			
-					while($row = $result->fetch_array()){
-						echo "<tr >";
-							echo "<td><input name='chkmasv[]' onchange='selectedRow(this,this.checked)' value='".$row["MaSV"]."' class='chkmasv' type='checkbox'/> </td>";
-							echo "<td>".++$start_row."</td>";
-							echo "<td>".$row["MaSV"]."</td>";
-							echo "<td>".$row["Holot"]." ".$row["Ten"]."</td>";
-							echo "<td>";
-							$d = strtotime($row["NgaySinh"]);
-							echo date("d-m-Y",$d);
-							echo "</td>";
-							echo "<td>".$row["QueQuan"]."</td>";
-							echo "<td>".$row["Email"]."</td>";
-							echo "<td>"; 
-								echo "<button type='submit' formmethod='post' form='frmNoAction' name='MaSV' value='".$row["MaSV"]."' formaction='sinhvien_edit.php?sid=".session_id()."'><img src='".IMAGES_DIR."/edit.png' /></button>";
-								echo "&nbsp; <button type='submit' name='btnXoa' value='".$row["MaSV"]."' onclick='return confirmDelete(this.value);'><img src='".IMAGES_DIR."/delete.png' /></button>";								
-							echo "</td>";
-						echo "</tr>";
-					}
-					$result->free();
+				<?php
+				foreach( $result['Items'] as $t ) {
+					$item = $marsharler->unmarshalItem($t);
+					echo "<tr >";
+						echo "<td><input name='chkmasv[]' onchange='selectedRow(this,this.checked)' value='".$item["MaSV"]."' class='chkmasv' type='checkbox'/> </td>";
+						echo "<td>".++$start_row."</td>";
+						echo "<td>".$item["MaSV"]."</td>";
+						echo "<td>".$item["HoLot"]." ".$item["Ten"]."</td>";
+						echo "<td>";
+						$d = strtotime($item["NgaySinh"]);
+						echo date("d-m-Y",$d);
+						echo "</td>";
+						echo "<td>".$item["QueQuan"]."</td>";
+						echo "<td>".$item["Email"]."</td>";
+						echo "<td>";
+							echo "<button type='submit' formmethod='post' form='frmNoAction' name='MaSV' value='".$item["MaSV"]."' formaction='sinhvien_edit.php?sid=".session_id()."'><img src='".IMAGES_DIR."/edit.png' /></button>";
+			 				echo "&nbsp; <button type='submit' name='btnXoa' value='".$item["MaSV"]."' onclick='return confirmDelete(this.value);'><img src='".IMAGES_DIR."/delete.png' /></button>";
+						echo "</td>";
+					echo "</tr>";
+
+				}
 				?>
 			</tbody>
 			<!--  end in danh sách-->

@@ -58,6 +58,7 @@ require "header.php";?>
 					'MaSV'   => array('S' => $user)
 				)
 			));
+			
 		}else{
 			// $sql = "SELECT MaGV as User, concat(Holot,' ', Ten) as HoTen, MatKhau  ".
 			// 		" FROM dbo_giangvien WHERE MaGV='".$user."' ".
@@ -72,7 +73,8 @@ require "header.php";?>
 		}
 		 
 		// nếu xác thực thành công
-		if($result){	
+		if($result['Item']['MatKhau']['S'] == $pass){	
+			if($type == "sv"){
 			// tạo session		 
 			$_SESSION["loggedin"]= true;
 			$_SESSION["User"] = $result['Item']['MaSV']['S'];
@@ -85,6 +87,21 @@ require "header.php";?>
 				setcookie("Password",$result['Item']['MatKhau']['S'],time()+3600*24);
 				setcookie("Type",$type,time()+3600*24);
 				 
+			}
+			}else{
+				// tạo session		 
+				$_SESSION["loggedin"]= true;
+				$_SESSION["User"] = $result['Item']['MaGV']['S'];
+				$_SESSION["HoTen"] = $result['Item']['HoLot']['S'] . " " . $result['Item']['Ten']['S'];
+				$_SESSION["Type"] = $type;
+				
+				// nếu người dùng chọn "Nhớ mật khẩu"
+				if (isset($_POST["chkNhoMK"])){
+					setcookie("User", $result['Item']['MaGV']['S'],time()+3600*24 );
+					setcookie("Password",$result['Item']['MatKhau']['S'],time()+3600*24);
+					setcookie("Type",$type,time()+3600*24);
+					 
+				}
 			}
 			header("location: index.php");
 				

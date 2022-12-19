@@ -12,3 +12,4 @@ define('ROOT_DIR', "");
 
 define("IMAGES_DIR", ROOT_DIR . "images");
 define("LIBS_DIR", ROOT_DIR . "libs");
+?>

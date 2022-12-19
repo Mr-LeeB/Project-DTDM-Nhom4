@@ -8,29 +8,40 @@ function auto_login(){
 		$type = $_COOKIE["Type"];
 			
 		if ($type == "sv"){
-			$sql = "SELECT MaSV as User, concat(Holot,' ', Ten) as HoTen, MatKhau ".
-					" FROM dbo_sinhvien WHERE MaSV='".$user."' ".
-					" AND MatKhau ='".$pass."'";
-
-
+			// $sql = "SELECT MaSV as User, concat(Holot,' ', Ten) as HoTen, MatKhau ".
+			// 		" FROM dbo_sinhvien WHERE MaSV='".$user."' ".
+			// 		" AND MatKhau ='".$pass."'";
+			$result = $db->getItem(array(
+				'ConsistentRead' => true,
+				'TableName' => 'sinhvien',
+				'Key'       => array(
+					'MaSV'   => array('S' => $user)
+				)
+			));
 		}else{
-			$sql = "SELECT MaGV as User, concat(Holot,' ', Ten) as HoTen, MatKhau  ".
-					" FROM dbo_giangvien WHERE MaGV='".$user."' ".
-					" AND MatKhau ='". $pass ."'";
+			// $sql = "SELECT MaGV as User, concat(Holot,' ', Ten) as HoTen, MatKhau  ".
+			// 		" FROM dbo_giangvien WHERE MaGV='".$user."' ".
+			// 		" AND MatKhau ='". $pass ."'";
+			$result = $db->getItem(array(
+				'ConsistentRead' => true,
+				'TableName' => 'giangvien',
+				'Key'       => array(
+					'MaGV'   => array('S' => $user)
+				)
+			));
 		}
-		$result = $db->query($sql);
 		// nếu xác thực thành công
 		if($row = $result->fetch_array()){
 	
 			// tạo lại session
 			$_SESSION["loggedin"]= true;
-			$_SESSION["User"] = $row["User"];
-			$_SESSION["HoTen"] = $row["HoTen"];
+			$_SESSION["User"] =  $result['Item']['MaSV']['S'];
+			$_SESSION["HoTen"] = $result['Item']['HoLot']['S'] . " " . $result['Item']['Ten']['S'];
 			$_SESSION["Type"] = $type;
 				
 			// đặt lại cookie với thời gian mới
-			setcookie("User",$row["User"],time()+3600*24 );
-			setcookie("Password",$row["MatKhau"],time()+3600*24);
+			setcookie("User",$result['Item']['MaSV']['S'],time()+3600*24 );
+			setcookie("Password",$result['Item']['HoLot']['S'] . " " . $result['Item']['Ten']['S'],time()+3600*24);
 			setcookie("Type",$type,time()+3600*24);
 				
 			header("location: index.php");
