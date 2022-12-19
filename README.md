@@ -45,11 +45,13 @@ sudo mv composer.phar /usr/local/bin/
 php -d memory_limit=-1 /usr/local/bin/composer.phar require aws/aws-sdk-php
 ```
 #### 4. Công nghệ sử dụng
+```
 - AWS SDK for PHP
 - DynamoDB
 - Apache2
 - PHP
 - Composer
 - Ubuntu 18.04 LTS (HVM), SSD Volume Type
+```
 #### 6. Tài liệu tham khảo
 - https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/getting-started_installation.html
