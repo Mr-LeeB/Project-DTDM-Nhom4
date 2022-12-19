@@ -36,8 +36,8 @@
 		<div id="nav"> 
 		<div  id="menu" > 
 			<a href="index.php">Trang chủ</a> |  
-			<a href="timkiem.php">Tìm kiếm</a>	|
-			<a href="gioithieu.php">Giới thiệu</a>		 
+			<a href="">Tìm kiếm</a>	|
+			<a href="">Giới thiệu</a>		 
 		</div>		 
 		<div  id="login" > 
 			<?php 

@@ -53,9 +53,7 @@ $(document).ready(function(){
 				success: function(data){
 					$("#divDSSV").html(data);
 					$(".btnXoa, .btnSua").hide();
-					 
 				}
-				
 			});
 		});
 	 
