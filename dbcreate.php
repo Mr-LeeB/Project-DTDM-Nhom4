@@ -24,20 +24,12 @@
             array(
                 'AttributeName' => 'MaSV',
                 'AttributeType' => 'S' 
-            ),
-            array(
-                'AttributeName' => 'MaLop',
-                'AttributeType' => 'S' 
-            ),
+            )
         ),
         'KeySchema' => array(
             array(
                 'AttributeName' => 'MaSV',
                 'KeyType' => 'HASH' 
-            ),
-            array(
-                'AttributeName' => 'MaLop',
-                'KeyType' => 'RANGE' 
             )
         ),
         'ProvisionedThroughput' => array(
@@ -61,6 +53,30 @@
         'KeySchema' => array(
             array(
                 'AttributeName' => 'MaLop',
+                'KeyType' => 'HASH'
+            )
+        ),
+        'ProvisionedThroughput' => array(
+            'ReadCapacityUnits'  => 6,
+            'WriteCapacityUnits' => 5
+        )
+    ));
+    $tableNames[] = $tableName;
+
+    $tableName = 'giangvien';
+    echo "Creating table $tableName. " . PHP_EOL;
+    
+    $response = $client->createTable(array(
+        'TableName' => $tableName,
+        'AttributeDefinitions' => array(
+            array(
+                'AttributeName' => 'MaGV',
+                'AttributeType' => 'S' 
+            )
+        ),
+        'KeySchema' => array(
+            array(
+                'AttributeName' => 'MaGV',
                 'KeyType' => 'HASH'
             )
         ),

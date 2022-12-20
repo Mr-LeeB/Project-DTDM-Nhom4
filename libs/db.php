@@ -12,5 +12,4 @@ $db = DynamoDbClient::factory(array(
 	'region' => 'us-east-1',
 	'version' => 'latest'
 ));
-
 ?>
