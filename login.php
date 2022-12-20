@@ -47,10 +47,6 @@ require "header.php";?>
 		$type = $_POST["rdodn"];
 		
 		if ($type == "sv"){
-			// $sql = "SELECT MaSV as User, concat(Holot,' ', Ten) as HoTen, MatKhau ".
-			// 	" FROM dbo_sinhvien WHERE MaSV='".$user."' ".
-			// 		" AND MatKhau ='".md5($pass)."'";
-			
 			$result = $db->getItem(array(
 				'ConsistentRead' => true,
 				'TableName' => 'sinhvien',
@@ -58,11 +54,7 @@ require "header.php";?>
 					'MaSV'   => array('S' => $user)
 				)
 			));
-			
 		}else{
-			// $sql = "SELECT MaGV as User, concat(Holot,' ', Ten) as HoTen, MatKhau  ".
-			// 		" FROM dbo_giangvien WHERE MaGV='".$user."' ".
-			// 		" AND MatKhau ='".md5($pass)."'";
 			$result = $db->getItem(array(
 				'ConsistentRead' => true,
 				'TableName' => 'giangvien',
