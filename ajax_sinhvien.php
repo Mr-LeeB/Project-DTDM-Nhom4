@@ -41,6 +41,7 @@ if (isset($_REQUEST["Type"])) {
 		$quequan = $_REQUEST["QueQuan"];
 		$matkhau = $_REQUEST["MatKhau"];
 		$email = $_REQUEST["Email"];
+		
 		$result = $db->updateItem(array(
 			'TableName' => 'sinhvien',
 			'Key'       => array(

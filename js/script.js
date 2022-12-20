@@ -277,7 +277,6 @@ $(document).ready(function(){
 					 }else{
 						 $("#rdoNu").prop("checked",true); 
 					 }
-					 
 					 $(dialog).find("#txtQueQuan").val(data.QueQuan);
 					 $(dialog).find("#txtMatKhau").val(data.MatKhau);
 					 $(dialog).find("#txtEmail").val(data.Email);
@@ -326,7 +325,7 @@ $(document).ready(function(){
 	   curosr: "move"
    }).disableSelection();
    
-   
+   // nút lưu
    $("#dialogUpdateSV").dialog({
 	   autoOpen:false,
 	   closeOnEscape: true,
@@ -399,7 +398,6 @@ $(document).ready(function(){
 										showError(err);
 									}
 								}
-								
 							});
 				 	 	 
 				 	 	}
